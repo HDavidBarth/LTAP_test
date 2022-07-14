@@ -9,4 +9,5 @@ The task is to give a breakdown of how many miles per day are being completed by
 The final program (main.py)takes the provided csv file, and creates a new one with two columns, one with dates, the other with miles travelled that day.
 main.py also creates an interactive plot of the data using the plotly library
 
+The documentation.txt file contains some brief explanations of the code I wrote. Honestly I'm not sure what was expected but I gave it my best shot.
 
