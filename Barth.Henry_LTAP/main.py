@@ -5,6 +5,7 @@
 import csv
 import datetime
 from modules.yard2Mile import yard2Mile
+from modules.makeGraph import makeGraph
 
 def main():
     filePath = "StreetProvo.csv"
@@ -12,6 +13,7 @@ def main():
     relevantIndexes = [84, 115]  #date, lengthYds
     formatCode = "%m/%d/%Y"  # date format code
     headers = ["Date", "Miles Traveled"]  #This is the final headers that will be used in the final CSV
+    graphFilePath = "plots\\test-milesTraveled_7.13.2022.html"  #This is the name of the filepath for your graph
 
     try:
         with open(filePath) as file:
@@ -56,6 +58,9 @@ def main():
     #Writes the finalList which is a list of lists where each list is a date and total miles that day
     write2CSV(finalList, headers, "csvFiles\\test-7.13.2022.csv")
 
+    #Creates HTML using final list
+    makeGraph(finalList, graphFilePath)
+    #########################END OF MAIN#################################################
 
 def splitDate(date):
     """the first parameter is a string with a date and then a time separated by a space
@@ -74,6 +79,5 @@ def write2CSV(multiDimensionalList, headers, pathName):
             writer.writerow(row)
 
 
-
 if __name__ == "__main__":
-    print(main())
+    main()
