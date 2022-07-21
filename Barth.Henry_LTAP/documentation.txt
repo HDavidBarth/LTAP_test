@@ -1,0 +1,63 @@
+This was a fun little test.
+
+Not gonna lie, it took me longer than I thought it would. I ended up taking a couple hours. Turns out I didn't know how to use the datetime library, so it took me a minute to figure that out
+to work with the dates in the data.
+
+Also I've never written documentation before so I'm not sure what is expected, I'm going to try my best.
+-------------------------------------------------------------------------------------------------------------
+
+The main.py program consists of 1 functions:
+
+main() - 
+    The main function provides the user with a GUI made with the pygame library. It allows the user to select the file in which they would like to convert.
+    After selecting the file, you can click a button to convert it to the requested format. The user is also given the option to graph the converted data.
+
+    The main function calls the promptFileOpen function from modules.fileStuff, dataConverter from modules.dataConverter, makeGraph from modules.makeGraph
+    and a bunch of constants from modules.CONSTANTS
+ 
+    There are several images which are used in the GUI. They are found in the images folder.
+
+
+--------------------------------------------------------------------------------------------------------------
+The modules folder contains 6 files that contain various functions or constants:
+
+-CONSTANTS.py :
+    (there are a few constants in this file)
+	WHITE - tuple rgb value of the color white
+	BLACK - tuple rgb value of the color black
+	WINDOW_WIDTH - integer specifying the width of the pygame window
+	WINDOW_HEIGHT - integer specifying the height of the pygame window
+	FPS = 30
+	BUTTON_WIDTH = 100
+	X_LOCATION = (WINDOW_WIDTH / 2) - (BUTTON_WIDTH / 2)
+
+- dataConverter.py :
+    dataConverter(filePath) - 
+	this function will convert csv data from the provided format to another
+	this function takes a file path string for the first parameter.
+	this function calls the modules.write2CSV() function
+	it returns a string and the file path of the converted file. If the file conversion was unsuccessful, it returns None
+
+- filestuff.py :
+    promptFileOpen() - 
+	This function takes no arguments, but it will open a file dialogue box for the user to select a file.
+	This returns a file path string
+    promptFileSave() - 
+	This function takes no arguments, but it will open a file dialogue box for the user to save a file.
+	This returns a file path string
+    write2CSV(multiDimensionalList, headers, pathName) - 
+        This function takes the final list which is created in the dataConverter function, and exports it into a .csv file
+	    It uses a multidimensional list, custom headers (as a list), and a custom path name (string )as parameters
+
+-makeGraph.py :
+    makeGraph(csvFile) - 
+        This function prompts requires a file path be passed in for the first argument. It returns strings that indicate its status (if the function did its job successfully)
+        The error handling only allows proper file formats to be used
+        The data is plotted using the plotly library and is saved in a .html format
+
+splitDate(date) - 
+    When a string is passed in with the format "MM/DD/YYY 12:00:00" it will split it and return only the month day and year
+
+yard2Mile(yards) - 
+    A value of yards is passed in (float or integer) 
+    and the number of miles is returned

@@ -1,82 +1,115 @@
 # Henry Barth
-# Start Date: 7.13.2022
-# Project: Utah LTAP Test
+# Start Date: 7.16.2022
+# Project: main / GUI for LTAP TEST
 
-import csv
-import datetime
-from modules.yard2Mile import yard2Mile
+
+import pygame
+import sys
+from pygwidgets.pygwidgets import TextButton as Tb
+from pygwidgets.pygwidgets import DisplayText as Dt
+from modules.fileStuff import promptFileOpen
+from modules.dataConverter import dataConverter
 from modules.makeGraph import makeGraph
+from modules.CONSTANTS import *
+
 
 def main():
-    filePath = "StreetProvo.csv"
-    csvData = []  # This will contain the cells which contain the length data
-    relevantIndexes = [84, 115]  #date, lengthYds
-    formatCode = "%m/%d/%Y"  # date format code
-    headers = ["Date", "Miles Traveled"]  #This is the final headers that will be used in the final CSV
-    graphFilePath = "plots\\test-milesTraveled_7.13.2022.html"  #This is the name of the filepath for your graph
+    # Initialize Pygame World
+    pygame.init()
+    clock = pygame.time.Clock()
+    iconImage = pygame.image.load("images\\lilLogo.png")
+    pygame.display.set_icon(iconImage)  #Change icon to custom icon
+    window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    pygame.display.set_caption("UTAH LTAP - CSV File Converter")
 
-    try:
-        with open(filePath) as file:
-            reader = csv.reader(file)
-            for row in reader:
-                newLine = []
-                for index in relevantIndexes:
-                    newLine.append(row[index])
-                csvData.append(newLine)
+    # Load Assets
+    filepathIn = None  # This is the filepathIn for CSV that has the data we bring in
+    welcomeImage = pygame.image.load("images\\welcome_instructions_45% .jpg")
+    number1Image = pygame.image.load("images\\Number1.png")
+    number2Image = pygame.image.load("images\\Number2.png")
+    number3Image = pygame.image.load("images\\Number3.png")
 
-    except FileNotFoundError:
-        print("File Not Found")
-        exit()
+    # Initialize Variables
 
-    csvData = csvData[1:]  #chops off the first element of the list which isn't needed
+    selectFileButton = Tb(window, (X_LOCATION, WINDOW_HEIGHT - 330), "Select CSV File")
+    filePathInDisplay = Dt(window, (0, WINDOW_HEIGHT - 280), "No file selected", justified="center", width=WINDOW_WIDTH)
 
-    for line in csvData:  #Starts at index of 1 to ignore headers from the file
-        line[0] = splitDate(line[0])  #Changes the element of the list so that you cut off the time portion of the date
-        line[0] = datetime.datetime.strptime(line[0], formatCode)  #change the first element into a datetime object
-        line[1] = yard2Mile(float(line[1]))  #changes the second element into a float that is miles
+    convertButton = Tb(window, (X_LOCATION - (BUTTON_WIDTH/2), WINDOW_HEIGHT - 255), "Convert CSV File and Save", width=BUTTON_WIDTH*2)
+    outputMessage1Display = Dt(window, (0, WINDOW_HEIGHT - 205), "", justified="center", width=WINDOW_WIDTH)
 
-    csvData.sort(key=lambda x: x[0])  # sorts this new list by date (first element in each line)
+    filePathOutDisplay = Dt(window, (0, WINDOW_HEIGHT - 180), "", justified="center", width=WINDOW_WIDTH)
+    makeGraphButton = Tb(window, (X_LOCATION - (BUTTON_WIDTH / 2), WINDOW_HEIGHT - 155), "Make Graph from Data",
+                       width=BUTTON_WIDTH * 2)
+    outputMessage2Display = Dt(window, (0, WINDOW_HEIGHT - 105), "", justified="center", width=WINDOW_WIDTH)
+    quitButton = Tb(window, (X_LOCATION, WINDOW_HEIGHT - 80), "QUIT",
+                    width=BUTTON_WIDTH,
+                    upColor=(230,150,150),
+                    overColor=(250,100,100),
+                    downColor=(250,50,50),
+                    )
 
-    # Make a list to hold unique dates in using for loop
-    dates = []
-    for line in csvData:
-        date = line[0]
-        if date not in dates:  #only adds dates that aren't in the list
-            dates.append(date)
+    buttons = [convertButton, selectFileButton, quitButton, makeGraphButton]
+    texts = [filePathInDisplay, filePathOutDisplay, outputMessage1Display, outputMessage2Display]
+    welcome = [welcomeImage]
+    images = [number1Image, number2Image, number3Image]
+    convertedPath = None  # Assigns this variable now so it can't be referenced before assignment
 
-    finalList = [[date] for date in dates]  #makes a list of lists which contain the dates that were in the sheet
+    # Loop forever
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or quitButton.handleEvent(event):
+                pygame.quit()
+                sys.exit()
 
-    # This loop is to add the total miles from csvData into the final list elements
-    for lst in finalList:
-        milesTotal = 0
-        for line in csvData:
-            if line[0] == lst[0]:
-                milesTotal += line[1]
-        lst.append(milesTotal)  #adds the total miles travelled to the list after the date
-        lst[0] = lst[0].strftime(formatCode)  #Change the datetime object back into string representation
+            if selectFileButton.handleEvent(event):
+                filepathIn = promptFileOpen()
+                filePathInDisplay.setValue(filepathIn)
 
-    #Writes the finalList which is a list of lists where each list is a date and total miles that day
-    write2CSV(finalList, headers, "csvFiles\\test-7.13.2022.csv")
+            if convertButton.handleEvent(event):
+                outputMessage1, convertedPath = dataConverter(filepathIn)  #converts data, lets you save and provides output message
+                outputMessage1Display.setValue(outputMessage1)
+                if convertedPath:
+                    filePathOutDisplay.setValue(convertedPath)
 
-    #Creates HTML using final list
-    makeGraph(finalList, graphFilePath)
-    #########################END OF MAIN#################################################
+            if makeGraphButton.handleEvent(event):
+                # makes graph from the recently created file.
+                # if there is not a recent file, it prompts user to select one
+                if convertedPath:
+                    outputMessage2 = makeGraph(convertedPath)  #saves an html graph for user to look at the data
+                else:
+                    outputMessage2 = makeGraph(promptFileOpen())
+                outputMessage2Display.setValue(outputMessage2)
 
-def splitDate(date):
-    """the first parameter is a string with a date and then a time separated by a space
-    eg: MM/DD/YYYY 12:00:00
-    it will return a string like: MM/DD/YYYY
-    """
-    return date.split(" ")[0]  #the split method returns a list object, and we only want to access the first element
 
-def write2CSV(multiDimensionalList, headers, pathName):
-    """Writes our organized data into a csv file for all to enjoy!"""
-    #Opens file in write mode
-    with open(pathName, "w", newline="") as f:
-        writer = csv.writer(f)  #make csv writer object
-        writer.writerow(headers)
-        for row in multiDimensionalList:
-            writer.writerow(row)
+        # Wipe Screen
+        window.fill(WHITE)
+
+        # Draw New Things
+        for button in buttons:
+            button.draw()
+        for text in texts:
+            text.draw()
+
+        for image in welcome:
+            imageRect = image.get_rect()
+            xPos , yPos = (WINDOW_WIDTH - imageRect.width) / 2, imageRect.top
+            window.blit(image, (xPos, yPos))
+
+        #Excuse the jankyness I got lazy here
+        height = 315
+        for image in images[:2]:
+            xPos , yPos = X_LOCATION * 0.70 , height
+            window.blit(image, (xPos, yPos))
+            height += 75
+        for image in images[2:]:
+            height += 20
+            xPos , yPos = X_LOCATION * 0.70 , height
+            window.blit(image, (xPos, yPos))
+
+
+        # Update Pygame Window
+        pygame.display.update()
+        clock.tick(FPS)
 
 
 if __name__ == "__main__":
