@@ -10,7 +10,7 @@ The final program (main.py)provides an interactive GUI for the user. It allows t
 
 main.py also allows the user to create an interactive plot of the data using the plotly library
 
-If you want to use the code, download the Barth.Henry_LTAP folder and run the main.py file
+If you want to use the code, download code as a zip folder, open the Barth.Henry_LTAP folder and run the main.py file. It is suggested that you choose the StreetProvo.csv file to convert, others likely will not work.
 
 The documentation.txt file contains some brief explanations of the code I wrote. Honestly I'm not sure what was expected but I gave it my best shot.
 
