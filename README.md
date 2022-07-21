@@ -6,6 +6,12 @@ The task is to give a breakdown of how many miles per day are being completed by
 
 ------------------------------------------------------------------------------------------------------------------------------
 
+**IMPORTANT: This program uses 3 packages for python that need to be downloaded. Plotly, pygame, and pygwidgets. To install these, open the command prompt on your computer and type in the following:**  <br />
+    -for plotly type: `pip install plotly` <br />
+    -for pygame type: `pip install -U pygame --user` <br />
+    -for pygwidgets type: `pip install -U pygwidgets --user`
+
+
 The final program (main.py)provides an interactive GUI for the user. It allows the user to select a CSV file in the format provided by LTAP, and creates a new csv file with two columns, one with dates, the other with miles travelled that day.
 
 main.py also allows the user to create an interactive plot of the data using the plotly library
